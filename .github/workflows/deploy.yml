@@ -31,6 +31,14 @@ jobs:
         docker tag ${{ secrets.ECR_REPOSITORY }}:latest \
         ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
 
+    - name: Test Docker Container
+      run: |
+          docker run -d -p 5000:80 --name test-container ${{ secrets.ECR_REPOSITORY }}
+          sleep 5
+          curl -f http://localhost:5000 || exit 1
+          docker stop test-container
+          docker rm test-container
+
     - name: Push Docker Image to ECR
       run: |
         docker push \
